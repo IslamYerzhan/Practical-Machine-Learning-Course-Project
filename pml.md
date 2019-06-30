@@ -1,5 +1,5 @@
 ---
-title: "Practical machine Learning course project"
+title: "Practical Machine Learning course project"
 output: html_document
 ---
 
@@ -25,14 +25,21 @@ library(e1071)
 train <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv",header = T)
 test <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv",header = T)
 dim(train)
-dim(test)
-str(train)
 ```
+[1] 19622   160
+
+```{r, echo=TRUE,message=F,warning=FALSE}
+dim(test)
+```
+[1]  20 160
+
+
 
 
 ##Data cleaning
 
 The training data set is consist of 19622 observations on 160 columns. We can notice that many columns have NA values or blank values on almost every observation. So we will remove them, because they will not produce any information. The first seven columns give information about the people who did the test, and also timestamps. We will not take them in our model.
+
 
 
 Train dataset
@@ -42,6 +49,7 @@ Train_cleaned <- train[,-col_to_remove]
 Train_cleaned <- Train_cleaned[,-c(1:7)]
 dim(Train_cleaned)
 ```
+[1] 19622    53
 
 Test dataset
 
@@ -51,7 +59,7 @@ Test_cleaned <- test[,-col_to_remove_]
 Test_cleaned <- Test_cleaned[,-1]
 dim(Test_cleaned)
 ```
-
+[1] 20 59
 
 Separate traintest to train and test 
 
@@ -77,6 +85,7 @@ Make plot
 ```{r, echo=TRUE,message=F,warning=FALSE}
 fancyRpartPlot(model1$finalModel)
 ```
+![](Rplot01.png)<!-- -->
 
 Make prediction
 ```{r, echo=TRUE,message=F,warning=FALSE}
@@ -88,6 +97,10 @@ Accuracy
 ```{r, echo=TRUE,message=F,warning=FALSE}
 math1$overall[1]
 ```
+
+Accuracy 
+0.4995922
+
 
 Model accuracy is 50%, not so good result. Еhe model will predict very weakly.
 
@@ -101,10 +114,31 @@ model2 <- train(classe~., data=new_train, method="rf", trControl=Control, verbos
 print(model2)
 ```
 
+Random Forest 
+
+14718 samples
+    52 predictor
+     5 classes: 'A', 'B', 'C', 'D', 'E' 
+ 
+ No pre-processing
+ Resampling: Cross-Validated (5 fold) 
+ Summary of sample sizes: 11773, 11774, 11775, 11775, 11775 
+ Resampling results across tuning parameters:
+ 
+   mtry  Accuracy   Kappa    
+    2    0.9912352  0.9889125
+   27    0.9907603  0.9883122
+   52    0.9845773  0.9804894
+ 
+ Accuracy was used to select the optimal model using the largest value.
+ The final value used for the model was mtry = 2.
+
 Make plot
 ```{r, echo=TRUE,message=F,warning=FALSE}
 plot(model2)
 ```
+![](Rplot2.png)<!-- -->
+
 
 Make prediction
 ```{r, echo=TRUE,message=F,warning=FALSE}
@@ -116,12 +150,15 @@ Accuracy
 ```{r, echo=TRUE,message=F,warning=FALSE}
 math2$overall[1]
 ```
+Accuracy 
+0.9946982
+
 
 Model accuracy is 99.5%, good result. 
 
 
 
-#Gradient boosting
+##Gradient boosting
 
 ```{r, echo=TRUE,message=F,warning=FALSE}
 model3 <- train(classe~., data=new_train, method="gbm", trControl=Control, verbose=FALSE)
@@ -131,7 +168,7 @@ Make a plot
 ```{r, echo=TRUE,message=F,warning=FALSE}
 plot(model3)
 ```
-
+![](Rplot3.png)<!-- -->
 
 Make prediction
 
@@ -145,6 +182,9 @@ Accuracy
 ```{r, echo=TRUE,message=F,warning=FALSE}
 math3$overall[1]
 ```
+Accuracy 
+0.9632953
+
 
 Accuracy is 96%, wery good result.
 
@@ -158,4 +198,6 @@ Random forest model showed the best result. Our forecast will be based on the Ra
 Ultimate_prediction <- predict(model2,newdata=Test_cleaned)
 Ultimate_prediction
 ```
-
+ [1] B A B A A E D B A A B C B A E E A B B B
+ 
+ Levels: A B C D E
